@@ -39,4 +39,16 @@ public final class Utilities
                 return Double.NaN;
         }
     }
+
+    /**
+     * Finds the Speed of Sound in M/s at a Temperature Kelvin
+     * @see "https://www.weather.gov/media/epz/wxcalc/speedOfSound.pdf"
+     * @see "http://www.weather.gov/media/epz/wxcalc/windConversion.pdf"
+     * @param temperatureKelvin - Temperature in Kelvin
+     * @return - Speed of Sound in M/s
+     */
+    public static double speedOfSoundAtTemperature(double temperatureKelvin)
+    {
+        return (643.855 * Math.pow((temperatureKelvin / 273.15), 0.5)) * 0.5144444;
+    }
 }
