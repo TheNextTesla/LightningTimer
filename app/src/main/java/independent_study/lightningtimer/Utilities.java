@@ -7,7 +7,7 @@ package independent_study.lightningtimer;
 
 public final class Utilities
 {
-    public enum TEMPERATURE_CONVERT {FAHRENHEIT_TO_CELSIUS, CELSIUS_TO_FAHRENHEIT, CELSIUS_TO_KELVIN, KELVIN_TO_CELSIUS}
+    public enum TEMPERATURE_CONVERT {FAHRENHEIT_TO_CELSIUS, CELSIUS_TO_FAHRENHEIT, CELSIUS_TO_KELVIN, KELVIN_TO_CELSIUS, FAHRENHEIT_TO_KELVIN, KELVIN_TO_FAHRENHEIT}
 
     private Utilities() {   }
 
@@ -34,6 +34,12 @@ public final class Utilities
 
             case KELVIN_TO_CELSIUS:
                 return (temperature - 273.15);
+
+            case FAHRENHEIT_TO_KELVIN:
+                return convertTemperature(convertTemperature(temperature, TEMPERATURE_CONVERT.FAHRENHEIT_TO_CELSIUS), TEMPERATURE_CONVERT.CELSIUS_TO_KELVIN);
+
+            case KELVIN_TO_FAHRENHEIT:
+                return convertTemperature(convertTemperature(temperature, TEMPERATURE_CONVERT.KELVIN_TO_CELSIUS), TEMPERATURE_CONVERT.CELSIUS_TO_FAHRENHEIT);
 
             default:
                 return Double.NaN;
