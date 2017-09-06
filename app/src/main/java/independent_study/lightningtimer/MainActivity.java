@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         startCount = System.currentTimeMillis();
         lastCount = startCount;
 
+        //https://stackoverflow.com/questions/8977212/button-click-listeners-in-android
         startStopButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
