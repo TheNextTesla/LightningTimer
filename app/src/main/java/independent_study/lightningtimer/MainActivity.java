@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by Blaine Huey
@@ -90,5 +91,15 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d("Lightning Timer", "Button De-Activated");
         handler.removeCallbacks(runnable);
+        simpleLightningFunction();
+    }
+
+    private void simpleLightningFunction()
+    {
+        double speedOfSound = Utilities.speedOfSoundAtTemperature(Utilities.convertTemperature(72, Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN));
+        double distanceFromLightning = speedOfSound * (timerCount / 1000);
+        double milesFromLightning = Utilities.convertDistance(distanceFromLightning, Utilities.DISTANCE_CONVERT.METERS_TO_MILES);
+
+        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format("%3f", milesFromLightning), Toast.LENGTH_SHORT).show();
     }
 }
