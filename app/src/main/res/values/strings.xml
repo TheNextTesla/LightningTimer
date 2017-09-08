@@ -1,3 +1,20 @@
 <resources>
+    <!-- Main Application Strings -->
     <string name="app_name">Lightning Timer</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- General Settings Strings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_internet_temperature">Internet Temperature</string>
+    <string name="pref_description_internet_temperature">Uses The Internet to Find the Current Temperature</string>
+
+    <string name="pref_title_location_based_temperature">Location Services</string>
+    <string name="pref_description_location_based_temperature">Uses Network Connection to Find Location</string>
+
+    <string name="pref_title_default_location_zip">Default Location Zip Code</string>
+    <string name="pref_default_default_location_zip">19355</string>
+
+    <string name="pref_title_default_temperature">Default Temperature</string>
+    <string name="pref_default_default_temperature">75</string>
 </resources>

@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="internet_switch"
+        android:summary="@string/pref_description_internet_temperature"
+        android:title="@string/pref_title_internet_temperature" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="location_switch"
+        android:summary="@string/pref_description_location_based_temperature"
+        android:title="@string/pref_title_location_based_temperature"
+        android:dependency="internet_switch" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_default_location_zip"
+        android:inputType="number"
+        android:key="default_location_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_default_location_zip"
+        android:dependency="internet_switch" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_default_temperature"
+        android:inputType="number"
+        android:key="default_temperature_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_default_temperature" />
+
+</PreferenceScreen>
