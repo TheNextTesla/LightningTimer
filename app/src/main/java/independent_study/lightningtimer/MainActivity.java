@@ -1,9 +1,12 @@
 package independent_study.lightningtimer;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -76,6 +79,26 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+        if (id == R.id.action_settings)
+        {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void activateTimer()
     {
         Log.d("Lightning Timer", "Button Activated");
@@ -94,10 +117,11 @@ public class MainActivity extends AppCompatActivity
         simpleLightningFunction();
     }
 
+
     private void simpleLightningFunction()
     {
         double speedOfSound = Utilities.speedOfSoundAtTemperature(Utilities.convertTemperature(72, Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN));
-        double distanceFromLightning = speedOfSound * (timerCount / 1000);
+        double distanceFromLightning = speedOfSound * (timerCount / 1000.0);
         double milesFromLightning = Utilities.convertDistance(distanceFromLightning, Utilities.DISTANCE_CONVERT.METERS_TO_MILES);
 
         Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format("%3f", milesFromLightning), Toast.LENGTH_SHORT).show();
