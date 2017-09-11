@@ -131,7 +131,7 @@ public final class Utilities
      * @return - A String of JSON from an Internet API
      * @throws Exception - Cannot Connect or Find Output
      */
-    public String getFromHTML(String urlToRead) throws Exception
+    public static String getFromHTML(String urlToRead) throws Exception
     {
         StringBuilder result = new StringBuilder();
 

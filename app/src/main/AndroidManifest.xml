@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="independent_study.lightningtimer">
 
+    <!-- https://stackoverflow.com/questions/30191047/access-coarse-location-permission-gives-a-cell-tower-precision-on-android -->
+    <!-- https://developer.android.com/reference/android/Manifest.permission.html#ACCESS_COARSE_LOCATION -->
+    <!-- https://developer.android.com/guide/topics/manifest/uses-permission-element.html -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -19,9 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity-->
         <activity android:name=".SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".MainActivity">

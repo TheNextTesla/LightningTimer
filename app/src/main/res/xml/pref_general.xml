@@ -1,5 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- https://developer.android.com/guide/topics/ui/settings.html#Activity -->
+
     <SwitchPreference
         android:defaultValue="true"
         android:key="internet_switch"
