@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 /**
  * Created by Blaine Huey
@@ -104,7 +107,8 @@ public class MainActivity extends AppCompatActivity
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //https://developer.android.com/guide/topics/resources/string-resource.html
-        sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        //sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherInfoManager = new WeatherInfoManager(sharedPreferences, locationManager, getString(R.string.api_key_string));
     }
 
@@ -162,7 +166,7 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d("Lightning Timer", "Button De-Activated");
         handler.removeCallbacks(runnable);
-        simpleLightningFunction();
+        lightningFunction();
     }
 
     /**
@@ -170,14 +174,12 @@ public class MainActivity extends AppCompatActivity
      * @see "https://math.stackexchange.com/questions/1169881/if-i-hear-thunder-5-seconds-after-i-see-the-lighting-can-i-calculate-the-distan"
      * @see "http://www.csgnetwork.com/lightningdistcalc.html"
      */
-    private void simpleLightningFunction()
+    private void lightningFunction()
     {
-        double temperature = weatherInfoManager.getCurrentTemperature(-75, 40);
-        //double speedOfSound = Utilities.speedOfSoundAtTemperature(Utilities.convertTemperature(72, Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN));
-        double speedOfSound = Utilities.speedOfSoundAtTemperature(temperature);
+        double speedOfSound = Utilities.speedOfSoundAtTemperature(weatherInfoManager.getBestTemperatureEstimate());
         double distanceFromLightning = speedOfSound * (timerCount / 1000.0);
         double milesFromLightning = Utilities.convertDistance(distanceFromLightning, Utilities.DISTANCE_CONVERT.METERS_TO_MILES);
 
-        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format("%3f", milesFromLightning), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format(Locale.US, "%3f", milesFromLightning), Toast.LENGTH_LONG).show();
     }
 }
