@@ -15,10 +15,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView timeTextView;
     private Button startStopButton;
+    private ListView historyListView;
     private Handler handler;
     private Runnable runnable;
 
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences sharedPreferences;
     private LocationManager locationManager;
 
+    private ArrayList<String> historyArrayList;
     private boolean buttonState;
     private long timerCount;
     private long startCount;
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         //Accesses the Android UI Components and Creates Objects to Control them
         timeTextView = (TextView) findViewById(R.id.TimerTextView);
         startStopButton = (Button) findViewById(R.id.StartStopButton);
+        historyListView = (ListView) findViewById(R.id.HistoryListView);
 
         //Android "Thread-Safe" (Doesn't Mess with UI) Looping Function
         handler = new Handler();
@@ -80,6 +86,9 @@ public class MainActivity extends AppCompatActivity
         timerCount = 0L;
         startCount = System.currentTimeMillis();
         lastCount = startCount;
+
+        historyArrayList = new ArrayList<>();
+        historyListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, historyArrayList));
 
         //Sets the UI Response for the startStopButton
         //https://stackoverflow.com/questions/8977212/button-click-listeners-in-android
@@ -213,5 +222,9 @@ public class MainActivity extends AppCompatActivity
 
         //Displays Miles from Lighting
         Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format(Locale.US, "%3f", milesFromLightning), Toast.LENGTH_LONG).show();
+
+        //https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
+        historyArrayList.add("Miles From Lightning: " + String.format(Locale.US, "%3f", milesFromLightning));
+        historyListView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_text_view, historyArrayList));
     }
 }
