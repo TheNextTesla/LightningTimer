@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity
     private int REQUEST_COARSE_LOCATION = 18129;
 
     private TextView timeTextView;
+    private TextView infoTextView;
     private Button startStopButton;
     private ListView historyListView;
     private Handler handler;
@@ -44,10 +48,12 @@ public class MainActivity extends AppCompatActivity
     private LocationManager locationManager;
 
     private ArrayList<String> historyArrayList;
+    private WeatherInfoManager.PROCESS_STATUS lastProcessStatus;
     private boolean buttonState;
     private long timerCount;
     private long startCount;
     private long lastCount;
+    private long originalCount;
 
     /**
      * Creates the Main Activity - Main Method
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity
 
         //Accesses the Android UI Components and Creates Objects to Control them
         timeTextView = (TextView) findViewById(R.id.TimerTextView);
+        infoTextView = (TextView) findViewById(R.id.InfoTextView);
         startStopButton = (Button) findViewById(R.id.StartStopButton);
         historyListView = (ListView) findViewById(R.id.HistoryListView);
 
@@ -76,8 +83,26 @@ public class MainActivity extends AppCompatActivity
             {
                 lastCount = System.currentTimeMillis();
                 timerCount = lastCount - startCount;
-                timeTextView.setText(String.format(Locale.US, "%d", timerCount) + " ms");
-                handler.postDelayed(this, 0);
+
+                if(timerCount > 300_000)
+                {
+                    timeTextView.setText("WAY TOO FAR AWAY");
+
+                    //Standard Stop Button Procedure
+                    buttonState = false;
+                    startStopButton.setText(getString(R.string.start));
+                    deactivateTimer();
+                }
+                else
+                {
+                    timeTextView.setText(String.format(Locale.US, "%6.3f s", timerCount / 1000.0));
+                    handler.postDelayed(this, 0);
+                }
+
+                if((lastProcessStatus != weatherInfoManager.getProcessStatus()) || ((lastCount - startCount) % 10000 < 10))
+                {
+                    infoTextView.setText(String.format(Locale.US, "Temp:%3.1f\nNet:%b\nLoc:%b", weatherInfoManager.getBestTemperatureEstimate(), weatherInfoManager.getProcessStatus() != WeatherInfoManager.PROCESS_STATUS.OFFLINE_DEFAULT, weatherInfoManager.getProcessStatus() == WeatherInfoManager.PROCESS_STATUS.ONLINE_LOCATION));
+                }
             }
         };
 
@@ -86,9 +111,10 @@ public class MainActivity extends AppCompatActivity
         timerCount = 0L;
         startCount = System.currentTimeMillis();
         lastCount = startCount;
+        originalCount = startCount;
 
         historyArrayList = new ArrayList<>();
-        historyListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, historyArrayList));
+        historyListView.setAdapter(new ArrayAdapter<>(this, R.layout.list_text_view, historyArrayList));
 
         //Sets the UI Response for the startStopButton
         //https://stackoverflow.com/questions/8977212/button-click-listeners-in-android
@@ -100,13 +126,13 @@ public class MainActivity extends AppCompatActivity
                 if(!buttonState)
                 {
                     buttonState = true;
-                    startStopButton.setText("Stop Timer");
+                    startStopButton.setText(getString(R.string.stop));
                     activateTimer();
                 }
                 else
                 {
                     buttonState = false;
-                    startStopButton.setText("Start Timer");
+                    startStopButton.setText(getString(R.string.start));
                     deactivateTimer();
                 }
             }
@@ -174,6 +200,11 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             return true;
         }
+        else if(id == android.R.id.home)
+        {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -221,10 +252,12 @@ public class MainActivity extends AppCompatActivity
         double milesFromLightning = Utilities.convertDistance(distanceFromLightning, Utilities.DISTANCE_CONVERT.METERS_TO_MILES);
 
         //Displays Miles from Lighting
-        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format(Locale.US, "%3f", milesFromLightning), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format(Locale.US, "%3.1f", milesFromLightning), Toast.LENGTH_SHORT).show();
 
         //https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
-        historyArrayList.add("Miles From Lightning: " + String.format(Locale.US, "%3f", milesFromLightning));
-        historyListView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_text_view, historyArrayList));
+        //https://stackoverflow.com/questions/3606530/listview-scroll-to-the-end-of-the-list-after-updating-the-list
+        historyArrayList.add(String.format(Locale.US, "Miles From Strike: %6.3f, %3.1f Secs", milesFromLightning, timerCount/ 1000.0));
+        historyListView.setAdapter(new ArrayAdapter<>(this, R.layout.list_text_view, historyArrayList));
+        historyListView.setSelection(historyArrayList.size() - 1);
     }
 }

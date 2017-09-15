@@ -23,7 +23,7 @@ class WeatherInfoManager
     private String openweatherapiZipcodeFormat;
     private boolean internetTemperature;
     private boolean locationServices;
-    private double defaultTemp;
+    private double defaultTemperature;
     private String defaultZip;
 
     private final Thread internetUpdater;
@@ -31,12 +31,15 @@ class WeatherInfoManager
     private Location location;
     private String apiCall;
 
+    enum PROCESS_STATUS {ONLINE_LOCATION, ONLINE_ZIP, OFFLINE_DEFAULT}
+    private PROCESS_STATUS processStatus;
+
     WeatherInfoManager(SharedPreferences sharedPreferences, LocationManager locationManagerEx, String apiKey)
     {
         //Gathers Information About User Settings
         internetTemperature = sharedPreferences.getBoolean("internet_switch", false);
         locationServices = sharedPreferences.getBoolean("location_switch", false);
-        defaultTemp = Utilities.convertTemperature(Double.parseDouble(sharedPreferences.getString("default_temperature_text", "75")), Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN);
+        defaultTemperature = Utilities.convertTemperature(Double.parseDouble(sharedPreferences.getString("default_temperature_text", "75")), Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN);
         defaultZip = sharedPreferences.getString("default_location_text", "19355");
 
         //The Link that Will Pass Back Current Weather Conditions Given Coordinates or zip-code Respectively
@@ -44,6 +47,19 @@ class WeatherInfoManager
         openweatherapiZipcodeFormat = "https://api.openweathermap.org/data/2.5/weather?zip=%5s,us&appid=" + apiKey;
 
         locationManager = locationManagerEx;
+        processStatus = PROCESS_STATUS.OFFLINE_DEFAULT;
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
+        {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s)
+            {
+                internetTemperature = sharedPreferences.getBoolean("internet_switch", false);
+                locationServices = sharedPreferences.getBoolean("location_switch", false);
+                defaultTemperature = Utilities.convertTemperature(Double.parseDouble(sharedPreferences.getString("default_temperature_text", "75")), Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN);
+                defaultZip = sharedPreferences.getString("default_location_text", "19355");
+            }
+        });
 
         //Criterion for How to Find Location
         //https://developer.android.com/reference/android/location/Criteria.html
@@ -78,21 +94,29 @@ class WeatherInfoManager
                         if(location != null)
                         {
                             Log.d("Weather Info Manager", "Changed Location to be " + location.getLatitude() + " " + location.getLongitude());
-                            defaultTemp = getCurrentTemperature(location.getLatitude(), location.getLongitude());
-                            Log.d("Weather Info Manager", "Changed (COR) Temperature to be " + defaultTemp + " K");
+                            defaultTemperature = getCurrentTemperature(location.getLatitude(), location.getLongitude());
+                            Log.d("Weather Info Manager", "Changed (COR) Temperature to be " + defaultTemperature + " K");
+                            processStatus = PROCESS_STATUS.ONLINE_LOCATION;
                         }
                         else
                         {
                             //If Location Attempt Fails, Run the Same Code as If Location Were Off (See Below)
-                            defaultTemp = getCurrentTemperature(defaultZip);
-                            Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemp + " K");
+                            defaultTemperature = getCurrentTemperature(defaultZip);
+                            Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
+                            processStatus = PROCESS_STATUS.ONLINE_ZIP;
                         }
                     }
                     else if(internetTemperature)
                     {
                         //Code to Run Using Default Zip Code
-                        defaultTemp = getCurrentTemperature(defaultZip);
-                        Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemp + " K");
+                        double tempDefaultTemperature = getCurrentTemperature(defaultZip);
+
+                        if(tempDefaultTemperature != Double.NaN)
+                        {
+                            defaultTemperature = tempDefaultTemperature;
+                            Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
+                            processStatus = PROCESS_STATUS.ONLINE_ZIP;
+                        }
                     }
 
                     //No Else Necessary..., It will Just Use the Original Default Temperature
@@ -115,12 +139,12 @@ class WeatherInfoManager
     }
 
     /**
-     * Returns An Estimate of the Speed of Sound (M/s) based on defaultTemp
-     * @return An Estimate of the Speed of Sound (M/s) based on defaultTemp
+     * Returns An Estimate of the Speed of Sound (M/s) based on defaultTemperature
+     * @return An Estimate of the Speed of Sound (M/s) based on defaultTemperature
      */
     double getCurrentSpeedOfSound()
     {
-        return Utilities.speedOfSoundAtTemperature(defaultTemp);
+        return Utilities.speedOfSoundAtTemperature(defaultTemperature);
     }
 
     /**
@@ -129,7 +153,16 @@ class WeatherInfoManager
      */
     double getBestTemperatureEstimate()
     {
-        return defaultTemp;
+        return defaultTemperature;
+    }
+
+    /**
+     * Returns the Current State of the WeatherInfoManager
+     * @return the Current State of the WeatherInfoManager
+     */
+    PROCESS_STATUS getProcessStatus()
+    {
+        return processStatus;
     }
 
     /**
@@ -138,7 +171,7 @@ class WeatherInfoManager
      * @param lon - Longitude
      * @return Temperature at Location in K
      */
-    double getCurrentTemperature(final double lat, final double lon)
+    private double getCurrentTemperature(final double lat, final double lon)
     {
         apiCall = null;
         double tempKelvin = Double.NaN;
@@ -173,7 +206,7 @@ class WeatherInfoManager
      * @param zipCode - US Zip Code
      * @return Temperature at Location in K
      */
-    double getCurrentTemperature(String zipCode)
+    private double getCurrentTemperature(String zipCode)
     {
         apiCall = null;
         double tempKelvin = Double.NaN;

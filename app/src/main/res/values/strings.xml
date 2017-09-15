@@ -2,6 +2,8 @@
     <!-- Main Application Strings -->
     <string name="app_name">Lightning Timer</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="start">Start Timer</string>
+    <string name="stop">Stop Timer</string>
 
     <!-- General Settings Strings -->
     <string name="pref_header_general">General</string>
