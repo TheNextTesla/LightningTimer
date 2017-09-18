@@ -99,9 +99,9 @@ public class MainActivity extends AppCompatActivity
                     handler.postDelayed(this, 0);
                 }
 
-                if((lastProcessStatus != weatherInfoManager.getProcessStatus()) || ((lastCount - startCount) % 10000 < 10))
+                if((lastProcessStatus != weatherInfoManager.getProcessStatus()) || ((lastCount - originalCount) % 10000 < 10))
                 {
-                    infoTextView.setText(String.format(Locale.US, "Temp:%3.1f\nNet:%b\nLoc:%b", weatherInfoManager.getBestTemperatureEstimate(), weatherInfoManager.getProcessStatus() != WeatherInfoManager.PROCESS_STATUS.OFFLINE_DEFAULT, weatherInfoManager.getProcessStatus() == WeatherInfoManager.PROCESS_STATUS.ONLINE_LOCATION));
+                    infoTextView.setText(String.format(Locale.US, "Net:%b\nLoc:%b\nTemp:%3.1f", weatherInfoManager.getProcessStatus() != WeatherInfoManager.PROCESS_STATUS.OFFLINE_DEFAULT, weatherInfoManager.getProcessStatus() == WeatherInfoManager.PROCESS_STATUS.ONLINE_LOCATION,  weatherInfoManager.getBestTemperatureEstimate()));
                 }
             }
         };
@@ -252,11 +252,11 @@ public class MainActivity extends AppCompatActivity
         double milesFromLightning = Utilities.convertDistance(distanceFromLightning, Utilities.DISTANCE_CONVERT.METERS_TO_MILES);
 
         //Displays Miles from Lighting
-        Toast.makeText(getApplicationContext(), "Miles From Lightning: " + String.format(Locale.US, "%3.1f", milesFromLightning), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Feet From Lightning: " + String.format(Locale.US, "%6.0f", Utilities.convertDistance(milesFromLightning, Utilities.DISTANCE_CONVERT.MILES_TO_FEET)), Toast.LENGTH_SHORT).show();
 
         //https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
         //https://stackoverflow.com/questions/3606530/listview-scroll-to-the-end-of-the-list-after-updating-the-list
-        historyArrayList.add(String.format(Locale.US, "Miles From Strike: %6.3f, %3.1f Secs", milesFromLightning, timerCount/ 1000.0));
+        historyArrayList.add(String.format(Locale.US, "Miles From Strike: %6.3f, %3.1f Secs", milesFromLightning, timerCount / 1000.0));
         historyListView.setAdapter(new ArrayAdapter<>(this, R.layout.list_text_view, historyArrayList));
         historyListView.setSelection(historyArrayList.size() - 1);
     }
