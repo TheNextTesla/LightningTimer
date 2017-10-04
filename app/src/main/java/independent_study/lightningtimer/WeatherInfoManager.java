@@ -34,7 +34,7 @@ class WeatherInfoManager
     enum PROCESS_STATUS {ONLINE_LOCATION, ONLINE_ZIP, OFFLINE_DEFAULT}
     private PROCESS_STATUS processStatus;
 
-    WeatherInfoManager(SharedPreferences sharedPreferences, LocationManager locationManagerEx, String apiKey)
+    WeatherInfoManager(final SharedPreferences sharedPreferences, LocationManager locationManagerEx, String apiKey)
     {
         //Gathers Information About User Settings
         internetTemperature = sharedPreferences.getBoolean("internet_switch", false);
@@ -101,9 +101,15 @@ class WeatherInfoManager
                         else
                         {
                             //If Location Attempt Fails, Run the Same Code as If Location Were Off (See Below)
-                            defaultTemperature = getCurrentTemperature(defaultZip);
-                            Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
-                            processStatus = PROCESS_STATUS.ONLINE_ZIP;
+                            //Code to Run Using Default Zip Code
+                            double tempDefaultTemperature = getCurrentTemperature(defaultZip);
+
+                            if(tempDefaultTemperature != Double.NaN)
+                            {
+                                defaultTemperature = tempDefaultTemperature;
+                                Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
+                                processStatus = PROCESS_STATUS.ONLINE_ZIP;
+                            }
                         }
                     }
                     else if(internetTemperature)
@@ -120,6 +126,11 @@ class WeatherInfoManager
                     }
 
                     //No Else Necessary..., It will Just Use the Original Default Temperature
+
+                    if(defaultTemperature == Double.NaN)
+                    {
+                        defaultTemperature = Utilities.convertTemperature(Double.parseDouble(sharedPreferences.getString("default_temperature_text", "75")), Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN);
+                    }
 
                     //Wait a Few Seconds
                     try
