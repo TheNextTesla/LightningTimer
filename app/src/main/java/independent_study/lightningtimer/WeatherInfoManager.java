@@ -104,7 +104,7 @@ class WeatherInfoManager
                             //Code to Run Using Default Zip Code
                             double tempDefaultTemperature = getCurrentTemperature(defaultZip);
 
-                            if(tempDefaultTemperature != Double.NaN)
+                            if(!Double.isNaN(tempDefaultTemperature))
                             {
                                 defaultTemperature = tempDefaultTemperature;
                                 Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
@@ -117,7 +117,7 @@ class WeatherInfoManager
                         //Code to Run Using Default Zip Code
                         double tempDefaultTemperature = getCurrentTemperature(defaultZip);
 
-                        if(tempDefaultTemperature != Double.NaN)
+                        if(!Double.isNaN(tempDefaultTemperature))
                         {
                             defaultTemperature = tempDefaultTemperature;
                             Log.d("Weather Info Manager", "Changed (ZIP) Temperature to be " + defaultTemperature + " K");
@@ -127,7 +127,7 @@ class WeatherInfoManager
 
                     //No Else Necessary..., It will Just Use the Original Default Temperature
 
-                    if(defaultTemperature == Double.NaN)
+                    if(Double.isNaN(defaultTemperature))
                     {
                         defaultTemperature = Utilities.convertTemperature(Double.parseDouble(sharedPreferences.getString("default_temperature_text", "75")), Utilities.TEMPERATURE_CONVERT.FAHRENHEIT_TO_KELVIN);
                     }
